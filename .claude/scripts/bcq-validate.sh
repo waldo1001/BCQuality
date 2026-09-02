@@ -68,6 +68,25 @@ while IFS= read -r a; do
   kw=$(grep -m1 '^keywords:' "$a" | tr ',' '\n' | wc -l | tr -d ' '); (( kw > 10 )) && warn "$kw keywords (aim for 3-10)"
 done <<< "$articles"
 
+echo "== 6b. Overlap with existing articles (Gate B, must be addressed)"
+while IFS= read -r a; do
+  [[ -z "$a" || ! -f "$a" ]] && continue
+  slug=$(basename "$a" .md); record="$TOOLKIT_ROOT/.claude/validation/$slug.md"
+  neighbours=$("$TOOLKIT_ROOT/.claude/scripts/bcq-overlap.sh" "$a" 2>/dev/null || true)
+  [[ -z "$neighbours" ]] && { ok "$slug: no keyword neighbours in the corpus"; continue; }
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    n=$(cut -d' ' -f1 <<< "$line"); path=$(cut -d' ' -f2 <<< "$line")
+    verdict=""; [[ -f "$record" ]] && verdict=$(grep -E "^overlap:.*$(printf '%s' "$path" | sed 's/[.[\*^$/]/\\&/g')" "$record" | grep -oiE '\b(covered|delta|unrelated)\b' | head -1 | tr 'A-Z' 'a-z')
+    case "$verdict" in
+      covered)   err "$slug is COVERED by $path (recorded verdict); do not contribute" ;;
+      delta|unrelated) ok "$path: $verdict (shares $n keyword(s), recorded in .claude/validation/$slug.md)" ;;
+      *) if grep -q "$(basename "$path")" "$a"; then warn "$path: cited from the article but no verdict in .claude/validation/$slug.md (add 'overlap: $path — delta|covered — reason')"
+         else err "$path shares $n keyword(s) and is neither cited nor given a verdict in .claude/validation/$slug.md"; fi ;;
+    esac
+  done <<< "$neighbours"
+done <<< "$articles"
+
 echo "== 7. Sample orphans in touched domains"
 for d in $(echo "$changed" | grep -oE '^community/knowledge/[^/]+' | sort -u); do
   for s in "$d"/*.al; do [[ -f "$s" ]] || continue; base=$(basename "$s"); slug="${base%%.*}"; [[ -f "$d/$slug.md" ]] || err "orphan sample $s (no $slug.md)"; done

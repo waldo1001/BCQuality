@@ -43,12 +43,27 @@ Spawn a second fresh subagent with the article text plus the bad sample: *"Using
 - Bad sample not flagged: the Anti Pattern's detection signal is not concrete enough. Rewrite it with the grep-able shape.
 - Good sample flagged: the Best Practice is ambiguous or the good sample still contains the pattern. Fix whichever is wrong.
 
+### Overlap review (Gate B, checked again)
+
+"Already on BCQuality" is a block, not a warning. The scout's overlap verdict is re-checked here because `/bcq-author` can also start from a topic, without a scout run.
+
+```bash
+.claude/scripts/bcq-overlap.sh .claude/worktrees/<slug>/community/knowledge/<domain>/<slug>.md
+```
+
+It lists every existing article sharing two or more frontmatter keywords with yours, plus every article yours cites. For each neighbour, spawn a **fresh subagent** as the maintainer: give it the new article and the neighbour and ask for exactly one of `COVERED` (the neighbour already states the central fact), `DELTA` (adjacent, but a distinct fact or consequence), or `UNRELATED`, with the deciding sentence quoted.
+
+- Any `COVERED` verdict ends the contribution: record it, tell the user, and do not open a PR. Sharpening the fact is allowed only if the sharpened version is re-scouted.
+- Every `DELTA` neighbour must be cross-referenced from the article's Description.
+- Half 1 fails until every neighbour has a recorded verdict (see the `overlap:` lines below).
+
 ### Record the evidence
 
 Write `.claude/validation/<slug>.md` in the main checkout (it is committed to the fork's `main` as part of the process record, never to the PR):
 
 ```
 # <slug>
+overlap: <neighbour path> — covered | delta | unrelated — <deciding sentence>   (one line per neighbour listed by bcq-overlap.sh)
 cold review (bad sample): missed | caught — <reviewer's one-line reason>
 warm review (bad sample): flagged citing <path> | not flagged
 warm review (good sample): clean | flagged — <reason>

@@ -31,6 +31,7 @@ never the toolkit. `.claude/worktrees/` is git-ignored.
 7. Community articles carry `> Contributions welcome — open a PR to refine or extend this article.` under the H1.
 8. Commit subject: `knowledge(<domain>): <what the rule says>` for one article, `knowledge: <summary>` for several, `skill(<id>): ...` for action skills.
 9. Opening a PR against microsoft/BCQuality needs an explicit yes from the user. Pushing a contribution branch to the fork is part of that step, not before.
+10. A fact that is already on BCQuality (in `microsoft/` or `community/`) is never contributed again. The scout drops it as `covered`; `bcq-validate.sh` fails until every keyword neighbour has a recorded `overlap:` verdict, and a `covered` verdict ends the contribution.
 
 ## The toolkit
 

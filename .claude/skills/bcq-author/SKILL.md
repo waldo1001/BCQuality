@@ -13,7 +13,7 @@ argument-hint: "<domain> <slug> | <path/to/source-article.md> | <topic sentence>
    - `skills/read.md` (schema, matching, sample-file rules)
    - `skills/write.md` (atomicity, sections, frontmatter choices, pre-PR checklist)
 3. Read two neighbouring articles in the target domain (one `microsoft/`, one `community/` if present) for tone and length.
-4. Read the scout backlog entry for this candidate in `.claude/scout/` (main checkout); it names the overlap to cross-reference and any claim still marked `verify`.
+4. Read the scout backlog entry for this candidate in `.claude/scout/` (main checkout); it names the overlap to cross-reference and any claim still marked `verify`. A candidate whose verdict is `covered` is never authored: the fact is already on BCQuality, and a duplicate PR is closed, not merged. Without a backlog entry (topic input), run `.claude/scripts/bcq-overlap.sh` on the scaffolded article as soon as its keywords exist, and stop if a neighbour already states the fact.
 
 ## Step 1 — pick the domain
 
