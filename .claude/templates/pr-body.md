@@ -10,6 +10,10 @@ __ADMISSION__
 
 __OVERLAP__
 
+## Sources
+
+__SOURCES__
+
 ## Evidence
 
 __EVIDENCE__
@@ -21,5 +25,6 @@ __EVIDENCE__
 - [ ] Samples referenced by filename from the article and present next to it
 - [ ] `validate_frontmatter.py`, `Test-KnowledgeIndex.ps1`, `Test-ReviewFixtures.ps1` pass locally
 - [ ] Only `community/` is touched
+- [ ] Commit author is linked to the GitHub account; branch rebased on `upstream/main`
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

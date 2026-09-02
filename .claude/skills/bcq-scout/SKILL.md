@@ -55,6 +55,7 @@ Ask the README question literally: *if this file did not exist, would a modern L
 Use the fact's own vocabulary (API names, property names, trigger names, cop rule ids) plus synonyms. Open every hit and decide:
 
 - **covered** — an existing article states the same fact. Drop, cite the path.
+- **in-flight** — an open upstream PR states the same fact. Drop or wait; the maintainers close duplicates as "Covered in a different PR", and they write their own article when a topic matters. Check with `gh pr list --repo microsoft/BCQuality --state open --search "<term>"` for the same terms.
 - **delta** — an existing article is adjacent but the fact is distinct (different object, different mechanism, a counter-case). One concern per file, so the delta becomes a *new sibling article* that cross-references the existing one in its Description. Never fold two concerns into one file.
 - **new** — no hit.
 
@@ -79,6 +80,6 @@ Then a table:
 
 | # | Candidate | Domain (leaf?) | Verdict | Why | Overlap | Proposed slug |
 
-Verdicts: `contribute`, `verify`, `delta`, `covered`, `reject`. Then a short ranked shortlist (max five) of what to author first, preferring domains the maintainers asked for (test generation, AppSource pre-flight, localization, permission sets, upgrade readiness) and facts with the crispest detection signal.
+Verdicts: `contribute`, `verify`, `delta`, `covered`, `in-flight`, `reject`. Then a short ranked shortlist (max five) of what to author first, preferring domains the maintainers asked for (test generation, AppSource pre-flight, localization, permission sets, upgrade readiness) and facts with the crispest detection signal.
 
 Commit the backlog on `main` with subject `toolkit: scout <source>`. Report the shortlist to the user and stop. Authoring is `/bcq-author` after `bcq-start.sh`.

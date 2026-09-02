@@ -28,10 +28,13 @@ never the toolkit. `.claude/worktrees/` is git-ignored.
 4. No fenced code blocks in knowledge files. Code lives in `<slug>.good.al` / `<slug>.bad.al` siblings, each referenced by filename from the article.
 5. `domain` must equal the folder name. Prefer a domain with a review leaf in `microsoft/skills/review/al-<domain>-review.md`, otherwise `al-code-review` never sources the article.
 6. Under 100 lines, one concern per file, and it must pass the admission test: *would a capable LLM get this wrong without the file?* Prove it with the cold/warm review, on a neutralised sample.
-7. Community articles carry `> Contributions welcome — open a PR to refine or extend this article.` under the H1.
-8. Commit subject: `knowledge(<domain>): <what the rule says>` for one article, `knowledge: <summary>` for several, `skill(<id>): ...` for action skills.
+7. Community articles usually carry `> Contributions welcome — open a PR to refine or extend this article.` under the H1. It is a convention (21 of 27 merged community articles have it), not a CI rule.
+8. Commit subject: `knowledge(<domain>): <what the rule says>` for one article, `knowledge: <summary>` for several, `skill(<id>): ...` for action skills. Maintainers squash-merge with the PR title, so the PR title is the subject.
 9. Opening a PR against microsoft/BCQuality needs an explicit yes from the user. Pushing a contribution branch to the fork is part of that step, not before.
-10. A fact that is already on BCQuality (in `microsoft/` or `community/`) is never contributed again. The scout drops it as `covered`; `bcq-validate.sh` fails until every keyword neighbour has a recorded `overlap:` verdict, and a `covered` verdict ends the contribution.
+10. A fact that is already on BCQuality (in `microsoft/` or `community/`) **or in an open upstream PR** is never contributed again. The scout drops it as `covered` or `in-flight`; `bcq-validate.sh` fails until every keyword neighbour has a recorded `overlap:` verdict, and a `covered` verdict ends the contribution. Maintainers close duplicates as "Covered in a different PR".
+11. Commits are authored with an email linked to the GitHub account (this repo's local git config uses the `users.noreply.github.com` form). Upstream's ruleset requires an extra approval for unattributed commits.
+12. Every behavioural claim in the article and every comment in the samples is backed by a Microsoft Learn page or an observed run, listed under `## See also` and in the evidence file. The reviewer verifies claims line by line; a wrong premise is fatal even when the recommendation is good.
+13. The detection signal is never broader than the anti pattern. Every article names the legitimate case it does not flag. "Your rule is broader than the defect" is the most frequent change request upstream.
 
 ## The toolkit
 

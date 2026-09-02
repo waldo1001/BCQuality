@@ -26,3 +26,7 @@ See sample: `__SLUG__.good.al`.
 __ANTI_PATTERN__
 
 See sample: `__SLUG__.bad.al`.
+
+## See also
+
+__SEE_ALSO__

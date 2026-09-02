@@ -13,6 +13,7 @@ All git commands below run inside the worktree: `cd .claude/worktrees/<slug>`.
 1. `.claude/scripts/bcq-validate.sh <slug>` exits 0, and `.claude/validation/<slug>.md` (main checkout) exists with verdict `ready`. If not, stop and run `/bcq-validate <slug>`.
 2. Branch is rebased: `.claude/scripts/bcq-update-fork.sh --rebase` from the main checkout.
 3. `git status` in the worktree shows only `community/` changes.
+4. `git log -1 --format=%ae` shows an email linked to the GitHub account (this repo's local config uses `<id>+<login>@users.noreply.github.com`). An unattributed commit shows `author: null` on GitHub and triggers the upstream ruleset's extra-approval requirement; fix with `git commit --amend --reset-author`.
 
 ## Commit
 
@@ -36,11 +37,12 @@ Fill `.claude/templates/pr-body.md`:
 
 - **What** — one paragraph: the fact, the domain, the files added.
 - **Why this is a knowledge file** — the admission-test answer in two sentences, naming what an LLM gets wrong.
-- **Overlap check** — the adjacent articles found by `/bcq-scout` and one line each on why this one is distinct (or "no existing article mentions X").
+- **Overlap check** — the adjacent articles found by `/bcq-scout` and one line each on why this one is distinct (or "no existing article mentions X"), plus the in-flight line (open upstream PRs searched, none on this fact).
+- **Sources** — the Learn URLs behind each claim, so the reviewer can verify without asking.
 - **Evidence** — paste `.claude/validation/<slug>.md`.
 - Keep the checklist; tick what is true.
 
-Title = the commit subject.
+Title = the commit subject. Maintainers squash-merge with the PR title; freeform titles merge too, the convention is ours.
 
 ## Confirm, then create
 
@@ -54,7 +56,10 @@ gh pr create --repo microsoft/BCQuality --base main --head waldo1001:community/<
 Then:
 
 ```bash
-gh pr checks <number> --repo microsoft/BCQuality --watch
+gh pr checks <number> --repo microsoft/BCQuality
+gh api "repos/microsoft/BCQuality/actions/runs?event=pull_request&head_sha=$(git rev-parse HEAD)" --jq '.workflow_runs[]|{name,status,conclusion}'
 ```
+
+`gh pr checks` shows only `flag`, `guard` and `license/cla` for a first-time contributor. The three validators (frontmatter, knowledge index, review fixtures) are `pull_request` workflows and sit at `conclusion: action_required` until a maintainer approves the run. Report that state as "validators awaiting maintainer approval", never as green; the local `bcq-validate.sh` run is the only validation evidence until then.
 
 Add a row to `.claude/contributions.md` in the main checkout (`| <date> | <PR URL> | <domain>/<slug> | open |`) and commit it there with subject `toolkit: ledger`. Report the URL and the CI result.

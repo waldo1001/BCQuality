@@ -34,11 +34,13 @@ Frontmatter: **exactly** the six keys. Nothing else, not `author`, not `title` (
 Body:
 
 - `# Title` — a full sentence stating the rule or the fact ("Install code does not run during a version upgrade").
-- `> Contributions welcome — open a PR to refine or extend this article.` — community convention, directly under the title.
+- `> Contributions welcome — open a PR to refine or extend this article.` — community convention, directly under the title (most merged articles have it; not enforced).
 - `## Description` — 2–5 sentences: the BC mechanic, why the wrong assumption is natural, the consequence. This is the retrieval target; write it so an agent can decide relevance from this paragraph alone. Say plainly what LLMs get wrong, the corpus does this ("LLMs are largely unaware the manual model exists").
 - `## Best Practice` — the *what* and *why*; end with ``See sample: `<slug>.good.al`.``
-- `## Anti Pattern` — the pattern, the consequence, and the **detection signal** a reviewer can grep for; end with ``See sample: `<slug>.bad.al`.``
-- Optional non-normative sections (`## Applies to`, `## See also`) for scope caveats and cross-references. No load-bearing content there.
+- `## Anti Pattern` — the pattern, the consequence, a `Detection signal:` sentence a reviewer can grep for, and the **carve-out**: the legitimate shape that must not be flagged. The signal is never broader than the defect; "scope the finding, preserve the deliberate case as a valid exception" is the maintainers' most frequent change request. End with ``See sample: `<slug>.bad.al`.``
+- `## See also` — the Microsoft Learn URLs that back the claims (one line each, `Title, section — URL`), plus the originating review finding when the article generalises one (BCApps PR discussion link). Recent merged articles do this and the reviewer praised it. Non-normative: no load-bearing content there.
+- Wording: `must` only where the documentation mandates it (the reviewer downgrades unsupported "must" to "should"); quote documented property names and keywords verbatim; `bc-version` never claims a release the docs do not tie the fact to.
+- Negative knowledge (a false-positive guard, or an article whose Anti Pattern includes a wrong review finding) adds the `false-positive` keyword; 24 corpus articles use it as the marker.
 
 Never: fenced code blocks (R10), more than 100 lines (R11; aim under 50), two concerns, "and" joining two topics in the Description, organisation names, "mandatory".
 
@@ -47,7 +49,9 @@ Never: fenced code blocks (R10), more than 100 lines (R11; aim under 50), two co
 - Self-contained, compile-plausible AL; never lifted from base-app source.
 - Object ids in the 50100 range; object name ends in `Good` / `Bad` (the evaluation harness neutralises those tokens, so it is the convention).
 - The bad sample shows exactly the anti pattern and nothing else; one full-line comment naming the defect is fine (the harness strips full-line comments).
-- The good sample is the bad sample fixed, not a different program. Keep both under ~40 lines.
+- The good sample is the bad sample fixed, not a different program: the two differ only in the property the article teaches. Length follows readability; merged samples run 25–100 lines. Each sample must read stand-alone (the reviewer opens it without the article).
+- Sample comments must agree with the code and with the article; a comment that contradicts either is a change request on its own ("contradicts its own code").
+- Object ids: samples are demonstration-only, so ids may repeat across the corpus; never claim they are unique unless `grep -rl "<id>" */knowledge` says so.
 - Both files must be referenced by filename from the article (R28) and any referenced file must exist (R28).
 
 ## Step 5 — porting from a custom layer (when the input is a source article)

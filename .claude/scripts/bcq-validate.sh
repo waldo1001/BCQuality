@@ -18,6 +18,9 @@ require_fork && ok "origin is the fork; upstream remote present" || err "remote 
 git fetch -q upstream 2>/dev/null || warn "could not fetch upstream (offline?)"
 behind=$(git rev-list --count "HEAD..upstream/main" 2>/dev/null || echo "?")
 [[ "$behind" == "0" ]] && ok "up to date with upstream/main" || warn "branch is $behind commit(s) behind upstream/main; rebase before PR (bcq-update-fork.sh --rebase)"
+email=$(git log -1 --format=%ae 2>/dev/null)
+if [[ "$email" == *"@users.noreply.github.com" ]]; then ok "commit author $email is a GitHub-linked identity"
+else warn "commit author $email must be linked to the GitHub account, or the upstream ruleset asks for an extra approval (git commit --amend --reset-author under a linked identity)"; fi
 
 echo "== 2. Change scope (vs upstream/main, committed, uncommitted, and untracked)"
 changed=$( { git diff --name-only upstream/main 2>/dev/null; git ls-files --others --exclude-standard; } | sort -u )
@@ -66,6 +69,16 @@ while IFS= read -r a; do
   done
   [[ -f "microsoft/skills/review/al-$domain-review.md" ]] && ok "domain '$domain' has a review leaf" || warn "domain '$domain' has no review leaf; al-code-review will not source it"
   kw=$(grep -m1 '^keywords:' "$a" | tr ',' '\n' | wc -l | tr -d ' '); (( kw > 10 )) && warn "$kw keywords (aim for 3-10)"
+  musts=$(grep -oiE '\bmust\b' "$a" | wc -l | tr -d ' '); (( musts > 2 )) && warn "$musts occurrences of 'must'; the reviewer downgrades any not mandated by the docs"
+  grep -qiE 'detection( signal)?:' "$a" && ok "Anti Pattern carries a detection signal" || warn "no 'Detection signal:' sentence in the Anti Pattern"
+  grep -qiE 'do not flag|not a defect|is not sufficient evidence|legitimate|valid exception|never flag' "$a" && ok "carve-out for the legitimate case present" || warn "no explicit carve-out (the shape that must not be flagged); 'rule broader than the defect' is the usual change request"
+  grep -q '^## See also' "$a" && ok "See also with sources present" || warn "no '## See also' with the Learn URLs behind the claims"
+  mybranch=$(git branch --show-current); inflight=""
+  for kw in $(grep -m1 '^keywords:' "$a" | sed 's/^keywords:[[:space:]]*\[//; s/\].*//' | tr ',' '\n' | tr -d ' ' | grep -vE '^(false-positive)$' | head -3); do
+    hits=$(gh pr list --repo microsoft/BCQuality --state open --search "$kw in:title" --json number,title,headRefName --jq ".[] | select(.headRefName != \"$mybranch\") | \"#\\(.number) \\(.title)\"" 2>/dev/null || true)
+    [[ -n "$hits" ]] && inflight="$inflight$(printf '\n    %s (matched: %s)' "$hits" "$kw")"
+  done
+  [[ -n "$inflight" ]] && warn "open upstream PR(s) share a keyword; confirm none states the same fact and record an in-flight: line:$inflight" || ok "no open upstream PR matches the top keywords"
 done <<< "$articles"
 
 echo "== 6b. Overlap with existing articles (Gate B, must be addressed)"

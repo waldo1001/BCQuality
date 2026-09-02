@@ -14,7 +14,7 @@ Two halves. The script does everything deterministic; you do the review proof.
 .claude/scripts/bcq-validate.sh <slug>      # targets .claude/worktrees/<slug>
 ```
 
-It runs inside the worktree, in order: branch and remote guards; change scope against `upstream/main` (only `community/`, no `custom/`, no new top-level); the upstream Python validator; `Test-KnowledgeIndex.ps1`; `Test-ReviewFixtures.ps1`; per-article checks (line count, H1, community tagline, placeholders, company wording, sample presence and references, Good/Bad object names, review-leaf presence, keyword count); sample orphans.
+It runs inside the worktree, in order: branch and remote guards; commit attribution (author email linked to the GitHub account); change scope against `upstream/main` (only `community/`, no `custom/`, no new top-level); the upstream Python validator; `Test-KnowledgeIndex.ps1`; `Test-ReviewFixtures.ps1`; per-article checks (line count, H1, community tagline, placeholders, company wording, sample presence and references, Good/Bad object names, review-leaf presence, keyword count); sample orphans.
 
 Fix every error and re-run. Warnings are allowed only with a one-line reason you will put in the PR body.
 
@@ -57,6 +57,18 @@ It lists every existing article sharing two or more frontmatter keywords with yo
 - Every `DELTA` neighbour must be cross-referenced from the article's Description.
 - Half 1 fails until every neighbour has a recorded verdict (see the `overlap:` lines below).
 
+### Claim ledger (what the reviewer actually checks)
+
+The only outside contribution ever rejected on content had a wrong premise and a bad sample showing an error that does not happen; the maintainer traced the sample line by line and cited Microsoft Learn. So, before the PR: list every behavioural claim in Description, Best Practice and Anti Pattern, and every claim made in a sample comment, and give each a Learn URL (`microsoft_docs_search` / `microsoft_docs_fetch`) or an observed run. A claim with neither is rewritten until it has one, or removed. Put the URLs in the article's `## See also` and the ledger in the evidence file as `claim:` lines.
+
+### Precision check (the maintainers' dominant change request)
+
+Read the Anti Pattern as the reviewer will: is the detection signal broader than the defect? Name the legitimate shape it would also match and confirm the article carries an explicit carve-out for it. Every open change request on upstream as of 2026-09-02 was this question. Record a `precision:` line.
+
+### In-flight overlap
+
+`gh pr list --repo microsoft/BCQuality --state open --search "<keyword>"` for the two or three strongest keywords. An open PR stating the same fact ends the contribution the same way `COVERED` does. Record an `in-flight:` line.
+
 ### Record the evidence
 
 Write `.claude/validation/<slug>.md` in the main checkout (it is committed to the fork's `main` as part of the process record, never to the PR):
@@ -64,6 +76,9 @@ Write `.claude/validation/<slug>.md` in the main checkout (it is committed to th
 ```
 # <slug>
 overlap: <neighbour path> — covered | delta | unrelated — <deciding sentence>   (one line per neighbour listed by bcq-overlap.sh)
+in-flight: none | PR #n — <same fact | adjacent>
+claim: <claim> — <Learn URL | observed: how>   (one line per claim in the article and the sample comments)
+precision: <the legitimate shape the signal could match> — carved out in <section>
 cold review (bad sample): missed | caught — <reviewer's one-line reason>
 warm review (bad sample): flagged citing <path> | not flagged
 warm review (good sample): clean | flagged — <reason>
