@@ -2,6 +2,7 @@
 
 Source: `/Users/waldo/SourceCode/iFacto/iFactoAcademy/iFacto Playbook/BCQuality/custom/knowledge` (20 articles)
 Corpus at triage time: upstream `main` 35a7e72, 273 indexed articles (microsoft 16 domains, community 4 domains).
+Source fingerprint: 3c6f317bf57b
 Gates: A = admission (remedial for an LLM?), B = overlap (already in the corpus?), C = portability (survives without the company policy?).
 
 | # | Candidate (custom article) | Domain (leaf?) | Verdict | Why | Overlap | Proposed slug |

@@ -41,7 +41,7 @@ flowchart LR
   F --> U
 ```
 
-`/bcq-contribute` runs the whole loop and stops twice: to pick a candidate, and to confirm the push and PR.
+`/bcq-contribute` runs the whole loop and stops twice: to pick a candidate, and to confirm the push and PR. `/bcq-from-guidelines` is the interactive front door: it lists what the company layer could contribute, checks each against upstream (reusing the scout backlog while `bcq-backlog-status.sh` says it is fresh), asks you to pick, and then runs the rest.
 
 ## Design choices worth stealing
 
@@ -72,9 +72,9 @@ CLAUDE.md                      workspace rules, loaded every session
 .claude/
 ├── README.md                  this file
 ├── .gitignore                 ignores worktrees/
-├── skills/bcq-*/SKILL.md      the eight skills
+├── skills/bcq-*/SKILL.md      the nine skills
 ├── scripts/                   _lib.sh · bcq-update-fork.sh · bcq-start.sh · bcq-finish.sh · bcq-new-article.sh
-│                              bcq-validate.sh · bcq-neutralize.sh · bcq-coverage.sh
+│                              bcq-validate.sh · bcq-neutralize.sh · bcq-coverage.sh · bcq-backlog-status.sh
 ├── templates/                 knowledge-article.md · sample.good.al · sample.bad.al · action-skill.md · pr-body.md
 ├── scout/                     triage backlogs, one per source
 ├── validation/                review-proof evidence and PR bodies, one per slug

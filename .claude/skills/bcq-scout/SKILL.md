@@ -68,7 +68,14 @@ Anything you are not certain about gets the verdict **verify** with the exact cl
 
 ## Step 5 — write the backlog
 
-Save `.claude/scout/<yyyy-mm-dd>-<source-slug>.md` with a table:
+Save `.claude/scout/<yyyy-mm-dd>-<source-slug>.md`. Its header must carry the two lines `bcq-backlog-status.sh` compares later:
+
+```
+Corpus at triage time: upstream `main` <short sha>, <n> indexed articles (...)
+Source fingerprint: <12 hex>      # (cd <source> && find . -name '*.md' -print0 | sort -z | xargs -0 shasum | shasum | cut -c1-12)
+```
+
+Then a table:
 
 | # | Candidate | Domain (leaf?) | Verdict | Why | Overlap | Proposed slug |
 

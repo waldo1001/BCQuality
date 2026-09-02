@@ -37,6 +37,7 @@ never the toolkit. `.claude/worktrees/` is git-ignored.
 | Skill | Job |
 |---|---|
 | `/bcq-contribute` | End-to-end: update fork → scout → start worktree → author → validate → PR → status |
+| `/bcq-from-guidelines` | Interactive: list company guidelines → check overlap → you pick → it contributes |
 | `/bcq-update-fork` | Merge `upstream/main` into `main`, push the fork, rebase open worktrees |
 | `/bcq-scout` | Triage candidates (a source folder, a topic, or review feedback) through three gates |
 | `/bcq-author` | Write one community article plus samples in a worktree, or port one from a custom layer |

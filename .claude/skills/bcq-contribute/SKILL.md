@@ -16,7 +16,7 @@ update-fork ─▶ scout ─▶ [pick] ─▶ start worktree ─▶ author ─�
 
 | Input | Meaning | Path |
 |---|---|---|
-| empty | scout the default source (iFacto custom layer) and ask which candidate to take | scout → pick |
+| empty | interactive pick from the company guidelines | `/bcq-from-guidelines` (list → check → choose → contribute) |
 | `<domain> <slug>` | a scouted candidate; the backlog in `.claude/scout/` has the details | start → author |
 | a path ending in `.md` | port that article from a custom layer | scout (single) → start → author |
 | a sentence | author from expertise on that topic | scout (topic) → start → author |
