@@ -14,6 +14,14 @@ __OVERLAP__
 
 __SOURCES__
 
+## Layer and retrieval
+
+Community layer. `microsoft/skills/review/al-__DOMAIN__-review.md` already sources the `__DOMAIN__` domain across layers, so no skill change is needed; review fixtures untouched.
+
+## Scope
+
+__SCOPE__
+
 ## Evidence
 
 __EVIDENCE__

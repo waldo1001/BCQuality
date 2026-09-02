@@ -38,7 +38,9 @@ Fill `.claude/templates/pr-body.md`:
 - **What** — one paragraph: the fact, the domain, the files added.
 - **Why this is a knowledge file** — the admission-test answer in two sentences, naming what an LLM gets wrong.
 - **Overlap check** — the adjacent articles found by `/bcq-scout` and one line each on why this one is distinct (or "no existing article mentions X"), plus the in-flight line (open upstream PRs searched, none on this fact).
-- **Sources** — the Learn URLs behind each claim, so the reviewer can verify without asking.
+- **Sources** — the Learn URLs behind each claim, so the reviewer can verify without asking; the `bc-version` floor and where it comes from.
+- **Layer and retrieval** — one line: community layer, which review leaf already sources the domain (no skill change), fixtures untouched.
+- **Scope** — what was considered and left out, and why. On a second round, add `## Review history` with one line per round; the reviewer re-reads only the final state and replies "Verified in <sha>" per thread, so answer every thread with the fixing sha.
 - **Evidence** — paste `.claude/validation/<slug>.md`.
 - Keep the checklist; tick what is true.
 

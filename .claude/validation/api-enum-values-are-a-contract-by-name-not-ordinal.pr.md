@@ -24,7 +24,19 @@ Found by `bcq-scout` and re-checked at validation with a fresh maintainer-role r
 - AppSourceCop AS0082 — https://learn.microsoft.com/dynamics365/business-central/dev-itpro/developer/analyzers/appsourcecop-as0082
 - AppSourceCop AS0083 — https://learn.microsoft.com/dynamics365/business-central/dev-itpro/developer/analyzers/appsourcecop-as0083
 
-The same links sit under `## See also` in the article.
+The same links sit under `## See also` in the article. `bc-version: [16..]`: the `enum` type is runtime 4.0 (BC 15) and strongly typed enum exposure on API pages is documented with API v2.0 (BC 16).
+
+## Layer and retrieval
+
+Community layer. `microsoft/skills/review/al-web-services-review.md` already sources the `web-services` domain across layers, so no skill change is needed; review fixtures untouched. Happy to see it promoted if it proves itself.
+
+## Scope
+
+Left out on purpose: ordinal stability for persisted rows and page-shape versioning, both already owned by the two cross-referenced Microsoft articles; Dataverse synchronisation (the option-set id mapping in `admin-cds-missing-option-values`) is a different mechanism from virtual tables and is not claimed here.
+
+## Review history
+
+- 2026-09-02, second push: rebased on #147; commit re-authored under a GitHub-linked identity; `bc-version` narrowed to `[16..]`; `false-positive` keyword added; `## See also` with the Learn sources added; bad-sample comment aligned with the article on AS0082; the claim "ordinals are not published at all" replaced by what the docs support.
 
 ## Evidence
 
@@ -40,6 +52,7 @@ claim: Dataverse virtual tables model enums as global OptionSets matched by Exte
 claim: AS0082 forbids renaming an enum value, AS0083 forbids deleting one; both Upgrade-category rules that run against a baseline package — https://learn.microsoft.com/dynamics365/business-central/dev-itpro/developer/analyzers/appsourcecop-as0082 and -as0083
 claim: responses and $filter carry member names, never ordinals — OData v4 JSON enum serialisation (member name as string); the article no longer claims "ordinals are not published at all" because `$metadata` EnumType members may list integer values, which Learn does not settle.
 claim (sample comment): compiler silent on a rename, AS0082 fires only against a baseline — rewritten 2026-09-02 so the comment agrees with the article (it previously said "the upgrade rule stays silent").
+bc-version: [16..] — the `enum` data type is runtime 4.0 (BC 15, Learn: Enum data type page) and strongly typed enum exposure on API pages is documented with API v2.0 (BC 16, transition-to-api-v2.0#enums); `[all]` would select the bad sample for targets where `enum` does not compile, the reason the reviewer rejected `[all]` on PRs 133 and 134.
 precision: a value rename on an enum that no API page exposes, a Caption-only change, and an appended value are the legitimate shapes the signal could match — all three carved out explicitly in the Anti Pattern ("Do not flag a caption change, and do not flag a new value appended at the end"; signal scoped to enums behind a `PageType = API` field). Keyword `false-positive` added, per the 24 corpus articles that use it as the marker.
 overlap: microsoft/knowledge/web-services/version-apis-by-adding-not-mutating-published-versions.md — delta — its contract is the page shape ("entity names, fields, keys, and behavior") and its signal is "a breaking shape change without a separate API page object"; a value rename inside an unchanged field leaves shape, entity, fields and keys identical, so nothing in it fires.
 overlap: microsoft/knowledge/upgrade/enum-values-additive-at-end.md — delta — it states the opposite carrier: "Persisted rows reference enum members by ordinal, not by name"; under its rule a rename that keeps the ordinal is harmless, across an API boundary it is breaking.

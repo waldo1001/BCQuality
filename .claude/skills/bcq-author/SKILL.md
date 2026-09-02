@@ -29,7 +29,7 @@ Slug rules: kebab-case, echoes the concern, no version numbers, no company prefi
 
 ## Step 3 — write the article
 
-Frontmatter: **exactly** the six keys. Nothing else, not `author`, not `title` (R02 rejects extras). Defaults: `bc-version: [all]`, `technologies: [al]`, `countries: [w1]`, `application-area: [all]`. Use `[N..]` only when the fact is release-gated. `keywords`: 3–10, lowercase kebab-case, the search terms an engineer would type, including synonyms (`findset`, `find-set`); never the domain or the company name.
+Frontmatter: **exactly** the six keys. Nothing else, not `author`, not `title` (R02 rejects extras). Defaults: `bc-version: [all]`, `technologies: [al]`, `countries: [w1]`, `application-area: [all]`. Use `[N..]` when the fact is release-gated **or when the article or either sample uses an API with a runtime floor** (the reviewer rejected `[all]` twice because "the bad sample would be selected for older targets where the call does not compile"); name the floor and its source in the PR. `keywords`: 3–10, lowercase kebab-case, the search terms an engineer would type, including synonyms (`findset`, `find-set`); never the domain or the company name.
 
 Body:
 
@@ -53,6 +53,10 @@ Never: fenced code blocks (R10), more than 100 lines (R11; aim under 50), two co
 - Sample comments must agree with the code and with the article; a comment that contradicts either is a change request on its own ("contradicts its own code").
 - Object ids: samples are demonstration-only, so ids may repeat across the corpus; never claim they are unique unless `grep -rl "<id>" */knowledge` says so.
 - Both files must be referenced by filename from the article (R28) and any referenced file must exist (R28).
+
+Layer: author in `community/`. Placement is the maintainers' call; they move generally applicable content to `microsoft/` before merge or promote it monthly. Never argue placement in the PR; an invitation to promote is welcome.
+
+Domain notes: `testing` content is reviewed by the BCApps test owners against their library idioms (no hardcoded messages, `Assert.Expected*` helpers, enqueue in the test and dequeue in the handler, `Initialize()` clearing `LibraryVariableStorage`, `AssertEmpty()` at the end). Read `microsoft/knowledge/testing/ui-handlers-in-tests.md` and its samples before writing a testing sample.
 
 ## Step 5 — porting from a custom layer (when the input is a source article)
 

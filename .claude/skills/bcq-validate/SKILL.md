@@ -78,6 +78,7 @@ Write `.claude/validation/<slug>.md` in the main checkout (it is committed to th
 overlap: <neighbour path> — covered | delta | unrelated — <deciding sentence>   (one line per neighbour listed by bcq-overlap.sh)
 in-flight: none | PR #n — <same fact | adjacent>
 claim: <claim> — <Learn URL | observed: how>   (one line per claim in the article and the sample comments)
+bc-version: <range> — <runtime floor of the APIs used in the article and samples, with the Learn page that states it>
 precision: <the legitimate shape the signal could match> — carved out in <section>
 cold review (bad sample): missed | caught — <reviewer's one-line reason>
 warm review (bad sample): flagged citing <path> | not flagged
