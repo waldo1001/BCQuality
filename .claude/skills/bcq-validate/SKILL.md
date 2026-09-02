@@ -33,6 +33,7 @@ First neutralise the sample, because the file name, the `Good`/`Bad` object name
 Spawn a **fresh subagent** (it has no memory of this conversation or the article) with only the neutral copy's path and this prompt: *"You are reviewing this Business Central AL file for defects. List every concrete defect with a one-line reason. If it is clean, say so."* Do not mention the article, the domain, or the expected finding.
 
 - Positive rule: if the cold reviewer **misses** the defect, the file is remedial. Record the miss.
+- **A cold reviewer that contradicts the article is a claim to verify, not a false positive to record.** Before labelling any cold answer wrong, check the reviewer's mechanism on Microsoft Learn as if it were a candidate fact. On PR 149 the "false positive" that carried the admission case was a correct description of OData schema 1.0; the article had only described 2.0, and the maintainer caught it. If the reviewer's answer holds in some context (an older runtime, another schema version, another client type), the article is missing that context, and the sharper fact is usually "the behaviour depends on X", which is a stronger admission case than either half.
 - Positive rule: if the cold reviewer **catches** it with a correct reason, the admission test is weak. Record it and tell the user; the maintainers will ask the same question. Sometimes the answer is to sharpen the fact (a more specific mechanic the model still gets wrong), sometimes to drop the file.
 - Negative knowledge (false-positive guard): cold-review the neutralised **good** sample instead. If the cold reviewer flags the legitimate pattern, the guard is needed. If it stays clean, the guard is weak.
 
@@ -60,6 +61,10 @@ It lists every existing article sharing two or more frontmatter keywords with yo
 ### Claim ledger (what the reviewer actually checks)
 
 The only outside contribution ever rejected on content had a wrong premise and a bad sample showing an error that does not happen; the maintainer traced the sample line by line and cited Microsoft Learn. So, before the PR: list every behavioural claim in Description, Best Practice and Anti Pattern, and every claim made in a sample comment, and give each a Learn URL (`microsoft_docs_search` / `microsoft_docs_fetch`) or an observed run. A claim with neither is rewritten until it has one, or removed. Put the URLs in the article's `## See also` and the ledger in the evidence file as `claim:` lines.
+
+### Context check
+
+Every BC behaviour that varies by runtime, schema version, client type, session type, or SaaS/on-premises must say which context the rule holds in, in the title or the first Description sentence, and the detection guard must not suppress a finding outside that context. An unscoped rule is both a wrong article and a wrong carve-out.
 
 ### Precision check (the maintainers' dominant change request)
 

@@ -39,6 +39,7 @@ Body:
 - `## Best Practice` — the *what* and *why*; end with ``See sample: `<slug>.good.al`.``
 - `## Anti Pattern` — the pattern, the consequence, a `Detection signal:` sentence a reviewer can grep for, and the **carve-out**: the legitimate shape that must not be flagged. The signal is never broader than the defect; "scope the finding, preserve the deliberate case as a valid exception" is the maintainers' most frequent change request. End with ``See sample: `<slug>.bad.al`.``
 - `## See also` — the Microsoft Learn URLs that back the claims (one line each, `Title, section — URL`), plus the originating review finding when the article generalises one (BCApps PR discussion link). Recent merged articles do this and the reviewer praised it. Non-normative: no load-bearing content there.
+- Scope the fact to its context. If the behaviour differs by runtime, OData schema version, client type, or session type, say so in the title or the first sentence, and make the carve-out conditional on that context.
 - Wording: `must` only where the documentation mandates it (the reviewer downgrades unsupported "must" to "should"); quote documented property names and keywords verbatim; `bc-version` never claims a release the docs do not tie the fact to.
 - Negative knowledge (a false-positive guard, or an article whose Anti Pattern includes a wrong review finding) adds the `false-positive` keyword; 24 corpus articles use it as the marker.
 
