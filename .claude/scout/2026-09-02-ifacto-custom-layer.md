@@ -40,7 +40,7 @@ Revision 2 (2026-09-02, second scout run, same corpus and source): the five open
 
 ## Shortlist (pick one)
 
-Status 2026-09-02: #20 in progress in worktree `.claude/worktrees/api-enum-values-are-a-contract-by-name-not-ordinal` (branch `community/web-services/api-enum-values-are-a-contract-by-name-not-ordinal`). #13 was used as the dry run of the process: article, samples, and evidence exist on local branch `community/testing/enumextension-in-test-app-injects-interface-doubles` (no worktree, not pushed); `bcq-start.sh testing enumextension-in-test-app-injects-interface-doubles` re-opens it. The user picks what to contribute first.
+Status 2026-09-02: #20 submitted as https://github.com/microsoft/BCQuality/pull/149 (worktree `.claude/worktrees/api-enum-values-are-a-contract-by-name-not-ordinal`). #13 was used as the dry run of the process: article, samples, and evidence exist on local branch `community/testing/enumextension-in-test-app-injects-interface-doubles` (no worktree, not pushed); `bcq-start.sh testing enumextension-in-test-app-injects-interface-doubles` re-opens it. The user picks what to contribute first.
 
 1. **#13 enumextension test doubles** — `testing` — contribute now. Hits the maintainers' "test generation" ask; crisp detection signal (`Extensible = false` or a `Mock`/`Test` value on a production dispatch enum). Draft already exists.
 2. **#17 Confirm throws in background sessions, Dialog.Open is suppressed** — `ui` — contribute. Negative knowledge with the crispest signal of the set (`Confirm(` reachable from a job-queue codeunit or API page, unguarded), and the source article's own error proves an LLM gets it wrong.
