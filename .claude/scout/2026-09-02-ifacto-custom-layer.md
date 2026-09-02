@@ -27,7 +27,10 @@ Gates: A = admission (remedial for an LLM?), B = overlap (already in the corpus?
 | 19 | upgrade/ifacto-upgrade-procedure-public-and-called-from-install | upgrade (yes) | covered | Both halves exist: install does not run on upgrade, and first install runs no upgrade (DataVersion zero check). The "one shared public procedure" is style. | microsoft/knowledge/upgrade/install-code-does-not-run-on-version-upgrade.md, microsoft/knowledge/upgrade/first-install-dataversion-zero-check.md | — |
 | 20 | web-services/ifacto-api-page-no-breaking-changes | web-services (yes) | **verify → contribute** | Distinct fact: Dataverse virtual tables bind a choice column to the option set at provisioning time, so swapping or reordering the enum behind an API field is compiler-silent and AppSourceCop-silent yet breaks consumers per environment. The corpus covers shape versioning, not the enum binding. Confirm the Dataverse binding claim on Learn before authoring. | delta of microsoft/knowledge/web-services/version-apis-by-adding-not-mutating-published-versions.md | api-enum-fields-bind-permanently-in-virtual-tables |
 
-## Shortlist (author in this order)
+## Shortlist (pick one)
+
+Status 2026-09-02: framework set up, nothing contributed yet. #13 was used as the dry run of the process: article, samples, and evidence exist on local branch `community/testing/enumextension-in-test-app-injects-interface-doubles` (no worktree, not pushed); `bcq-start.sh testing enumextension-in-test-app-injects-interface-doubles` re-opens it. The user picks what to contribute first.
+
 
 1. **#13 enumextension test doubles** — `testing` — contribute now. Hits the maintainers' "test generation" ask; crisp detection signal (`Extensible = false` or a `Mock`/`Test` value on a production dispatch enum).
 2. **#20 API enum fields and virtual tables** — `web-services` — verify the Dataverse binding claim, then contribute.
