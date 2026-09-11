@@ -4,7 +4,7 @@ id: al-events-review
 version: 1
 title: AL events review
 description: Reviews AL source changes against events-and-subscribers guidance from BCQuality.
-inputs: [pr-diff, file-path]
+inputs: [pr-diff, file-path, folder-path]
 outputs: [findings-report]
 bc-version: [all]
 technologies: [al]
@@ -16,11 +16,11 @@ application-area: [all]
 
 Reviews AL source changes against the `events` knowledge domain in BCQuality and emits a findings report. This is a leaf action skill: it invokes no sub-skills. It is one of the skills composed by `al-code-review`.
 
-An orchestrator invokes this skill with either a `pr-diff` (the standard PR-review entry point) or a `file-path` (single-file review). The skill produces a single JSON document conforming to the DO output contract.
+An orchestrator invokes this skill with a `pr-diff`, `file-path`, or `folder-path`. The skill produces a single JSON document conforming to the DO output contract.
 
 ## Source
 
-Read the BCQuality knowledge index once — the `knowledge-index.json` BCQuality builds at the root of the knowledge checkout (Entry's preparation step regenerates it over the live, already-filtered clone — see `skills/entry.md`). It lists every article that survived layer and allow/deny filtering and carries, per article, its `path`, `layer`, `domain`, frontmatter dimensions, `keywords`, `title`, and a one-line `description` hint — exactly the fields Relevance and Worklist consume. Take the index entries whose `domain` is `events` as this skill's candidate set across every enabled layer; do not open the individual article files at this step. Open an article's full body only once it enters the Worklist below, so a review reads the index plus the handful of worklisted articles instead of every file under `*/knowledge/events/**`.
+Use READ's **Bounded retrieval for review skills** workflow with `-Domain events`. Consume every catalog page across enabled layers before applying this leaf's Relevance and Worklist; preserve each exact catalog path and open complete bodies only for exact paths selected by the Worklist. If the helper or prepared index is unavailable or invalid, use READ's explicit path-discovery and bounded native-read fallback.
 
 ## Relevance
 
@@ -51,7 +51,7 @@ When the post-conflict worklist is empty because no applicable events knowledge 
 
 The following targeted checks map diff signals to specific `events` articles. Treat each as a candidate-selection cue: when the signal appears in the changed code, add the named article to the worklist and evaluate it in Action.
 
-- `IsHandled` raised without an immediately preceding `IsHandled := false;`, or one `IsHandled` variable reused across several raises with no reset between them — `initialize-ishandled-to-false-before-publishing`.
+- An `IsHandled` value that can carry over as `true` (reused after an earlier raise, re-entered on a later loop iteration, input/global/field, or otherwise seeded) is passed to a publisher without a reset — `reset-ishandled-only-when-the-value-can-carry-over`. Do not match one non-looping raise using a fresh local Boolean, or a later raise reached only after a semantically valid `if IsHandled then exit;` proves the value is false.
 - `if IsHandled then exit;` in a routine that also raises a paired `OnAfter…` event later, so the after-event is skipped whenever the call is handled — `preserve-onafter-execution-when-ishandled-skips-the-body`.
 - Any parameter added to a public Business/Integration event procedure, regardless of position; do not flag additions or reordering on `local`/`internal` publishers merely because a new parameter was not appended — `add-new-event-parameters-at-the-end`.
 - A shipped Business/Integration event renamed or removed, or an existing parameter renamed, removed, retyped, or changed to/from `var`, based on the mistaken assumption that `local` or `internal` prevents dependent subscription; parameter order alone is not a subscriber-contract violation — `treat-local-and-internal-events-as-subscriber-contracts`.
@@ -141,7 +141,7 @@ Output conforms to the DO output contract. Every finding this skill emits MUST s
 }
 ```
 
-The empty-corpus case — BCQuality's state until events knowledge files land — produces:
+When no applicable events knowledge is available, the report is:
 
 ```json
 {

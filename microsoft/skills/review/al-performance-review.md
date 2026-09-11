@@ -4,7 +4,7 @@ id: al-performance-review
 version: 1
 title: AL performance review
 description: Reviews AL source changes against performance guidance from BCQuality.
-inputs: [pr-diff, file-path]
+inputs: [pr-diff, file-path, folder-path]
 outputs: [findings-report]
 bc-version: [all]
 technologies: [al]
@@ -16,11 +16,11 @@ application-area: [all]
 
 Reviews AL source changes against the `performance` knowledge domain in BCQuality and emits a findings report. This is a leaf action skill: it invokes no sub-skills. It is one of the skills composed by `al-code-review`.
 
-An orchestrator invokes this skill with either a `pr-diff` (the standard PR-review entry point) or a `file-path` (single-file review). The skill produces a single JSON document conforming to the DO output contract.
+An orchestrator invokes this skill with a `pr-diff`, `file-path`, or `folder-path`. The skill produces a single JSON document conforming to the DO output contract.
 
 ## Source
 
-Read the BCQuality knowledge index once — the `knowledge-index.json` BCQuality builds at the root of the knowledge checkout (Entry's preparation step regenerates it over the live, already-filtered clone — see `skills/entry.md`). It lists every article that survived layer and allow/deny filtering and carries, per article, its `path`, `layer`, `domain`, frontmatter dimensions, `keywords`, `title`, and a one-line `description` hint — exactly the fields Relevance and Worklist consume. Take the index entries whose `domain` is `performance` as this skill's candidate set across every enabled layer; do not open the individual article files at this step. Open an article's full body only once it enters the Worklist below, so a review reads the index plus the handful of worklisted articles instead of every file under `*/knowledge/performance/**`.
+Use READ's **Bounded retrieval for review skills** workflow with `-Domain performance`. Consume every catalog page across enabled layers before applying this leaf's Relevance and Worklist; preserve each exact catalog path and open complete bodies only for exact paths selected by the Worklist. If the helper or prepared index is unavailable or invalid, use READ's explicit path-discovery and bounded native-read fallback.
 
 ## Relevance
 
@@ -47,7 +47,8 @@ Apply these targeted cues even when simple token overlap would rank the article 
 
 - Worklist `use-setautocalcfields-for-per-row-flowfields.md` when a record loop calls `CalcFields`, or when every row reads the same FlowField for a comparison, branch, or per-record action. Worklist `calcsums-instead-of-calcfields-in-loop.md` instead when the loop only accumulates one set total.
 - Worklist `hidden-flowfields-still-calculate-before-bc26-opt-in.md` when a page control directly sources a FlowField and sets `Visible = false` or a visibility expression. Suppress it when the target is known to have BC26's **Calculate only visible FlowFields** feature enabled, or when the FlowField is cheap and intentionally preloaded.
-- Worklist `avoid-commit-inside-loops.md` only when `Commit()` is inside a record-iteration body or a helper invoked once per row. Do not match one `Commit()` after a bounded checkpoint helper returns, a `Commit()` outside iteration, or comments and documentation that merely mention commits.
+- Worklist `avoid-commit-inside-loops.md` when `Commit()` is inside a record-iteration body or a checkpoint loop lacks persisted progress that excludes completed work on retry. Do not match a commit after a complete business unit when the same transaction persists a restart-safe watermark/state and errors propagate. Still match a full-tail `FindSet` with periodic commits as unbounded retrieval; restart safety does not make it `TOP X`.
+- Worklist `prefer-modifyall-over-per-row-modify.md` for a constant-assignment `Modify(false)` loop with no validation or per-row semantics. Worklist `triggers-and-media-field-regress-modifyall.md` when table trigger code, related subscribers, security filtering, `Media`/`MediaSet`, or companion fields affect a bulk path. A progress dialog does not generically exempt a loop; accept it only when the equivalent bulk call already falls back to individual operations and semantics are preserved.
 - Worklist `avoid-cloning-records-before-modify-delete-in-loops.md` when an iteration calls `Copy` or `RecordRef.GetTable` before `Modify`/`Delete`, or passes the iterated record without `var` to a helper that writes that record. Do not worklist it from `Modify`, `Delete`, or `RecordRef` alone; exclude a direct write on the iterator, a read-only copy, a temporary record, a different target table, and a `RecordRef` opened and iterated directly.
 - Worklist `use-tryfunction-for-error-catching-not-rollback.md` only when writes occur inside a try method and the code or surrounding flow expects an error to roll them back. A bare try-method call whose Boolean result is ignored belongs exclusively to `error-handling/ignored-tryfunction-return-disables-try-semantics.md`; do not worklist the performance article from that call shape alone.
 - For `LockTable` in a pure read helper, select exactly one owner. Use `do-not-locktable-in-read-only-procedure.md` when the helper needs no stronger isolation and should remove the lock. Use `prefer-readisolation-over-locktable-for-reads.md` instead when the code explicitly requires committed-read semantics and `ReadIsolation` is the replacement. Never emit both findings for the same call.
@@ -74,7 +75,7 @@ Set `confidence` to:
 
 After evaluating each worklist entry, also consider whether the diff exhibits a performance defect the agent recognises from its general AL knowledge that no knowledge file in the worklist covers. Such candidates are agent findings within this skill's domain — emit them with `references: []`, an `id` slug prefixed with `agent:`, `confidence` capped at `medium`, `severity` capped at `minor` (agent findings are advisory and non-gating), and a `message` that is self-contained (describing both the issue and a concrete recommendation, since there is no knowledge-file footer for the consumer to fall back on). Hold every candidate to the precision bar in `skills/do.md` (*Agent findings*): emit only a concrete, material performance defect a knowledgeable BC reviewer would agree is wrong — steelman it first and drop anything stylistic, speculative, dependent on code outside the diff, or merely a valid alternative; when in doubt, omit. The scope is strictly performance; defects outside this domain belong to other leaves and MUST NOT be emitted here. Before emitting, check the worklist for a knowledge file that matches the candidate — if one exists, upgrade the candidate to a knowledge-backed finding instead. See `skills/do.md` for the full contract.
 
-For every emitted finding, decide whether the fix is mechanical. A fix is mechanical when it is small, local, and unambiguous from the diff context (for example: delete unreachable lines; replace `Count() > 0` with `not IsEmpty()`; move a local `Label` to object scope; add a missing `ToolTip`, `OptionCaption`, or `DataClassification`; replace a string-concatenated `Error` with a Label-backed call; change an over-broad permission token; or add an obvious `else`/guard branch). For mechanical findings, emit `findings[].suggested-code` with the literal replacement for the source lines indicated by `location`. The payload must be a verbatim replacement — no diff markers, no fences, no commentary — that the consumer can render as a one-click suggestion. When a `.good.al` companion exists and the diff context matches the `.bad.al` shape, adapt the `.good.al` replacement into `suggested-code`.
+For every emitted finding, decide whether the fix is mechanical. A fix is mechanical when it is small, local, and unambiguous from the diff context (for example: delete unreachable lines; replace `Count() > 0` with `not IsEmpty()`; add a missing `ToolTip`, `OptionCaption`, or `DataClassification`; replace a string-concatenated `Error` with a Label-backed call; change an over-broad permission token; or add an obvious `else`/guard branch). For mechanical findings, emit `findings[].suggested-code` with the literal replacement for the source lines indicated by `location`. The payload must be a verbatim replacement — no diff markers, no fences, no commentary — that the consumer can render as a one-click suggestion. When a `.good.al` companion exists and the diff context matches the `.bad.al` shape, adapt the `.good.al` replacement into `suggested-code`.
 
 Omit `suggested-code` only when the appropriate fix depends on context the skill cannot determine, when multiple defensible replacements exist, or when the fix spans non-contiguous code. If a finding is mechanical-looking but you omit `suggested-code`, set `findings[].suggested-code-omission-reason` to a short explanation. See `skills/do.md` for the full contract.
 
@@ -133,7 +134,7 @@ Output conforms to the DO output contract. Every finding this skill emits MUST s
 }
 ```
 
-The empty-corpus case — BCQuality's state until performance knowledge files land — produces:
+When no applicable performance knowledge is available, the report is:
 
 ```json
 {
